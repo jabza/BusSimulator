@@ -4,12 +4,12 @@ using System.Collections;
 public class CameraController : MonoBehaviour
 {
     public  Transform   target;
-	public  int         zoomSpeed = 1;
-    public  int         zoomIncrement = 8;
+	public  int         zoomSpeed = 4;
+    public  int         zoomIncrement = 4;
     public  int         zoomCap = 64;
 
-	private Camera      camera;
-    private int         zoomTarget = 16;
+    private int         zoomTarget = 8;
+    private Camera      camera;
 
 	void Awake()
 	{

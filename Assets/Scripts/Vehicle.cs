@@ -8,16 +8,17 @@ public class Vehicle : MonoBehaviour
 
     public  float           Accelerator
     {
+        get { return force.relativeForce.y; }
         set { force.relativeForce = new Vector2(0, gears[(int)currentGear] * value); }
     }
 
     public  float           Steering
     {
-        get { return wheels[0].transform.localEulerAngles.z; }
+        get { return tyres[0].transform.localEulerAngles.z; }
         set
         {
-            wheels[0].transform.localEulerAngles = new Vector3(0, 0, turnAngle * value);
-            wheels[1].transform.localEulerAngles = new Vector3(0, 0, turnAngle * value);
+            tyres[0].transform.localEulerAngles = new Vector3(0, 0, turnAngle * value);
+            tyres[1].transform.localEulerAngles = new Vector3(0, 0, turnAngle * value);
         }
     }
 
@@ -56,12 +57,15 @@ public class Vehicle : MonoBehaviour
         get { return currentIndicator; }
         set
         {
-            if(value == EIndicator.OFF)
+            if(value == EIndicator.OFF || value == Indicator)
                 miscAudio.Stop();
             else
                 miscAudio.Play();
 
-            currentIndicator = value;
+            if(value != Indicator)
+                currentIndicator = value;
+            else
+                currentIndicator = EIndicator.OFF;
         }
     }
 
@@ -70,11 +74,16 @@ public class Vehicle : MonoBehaviour
         get { return GetLocalVelocity(chassis); }
     }
 
+    public float            Speed
+    {
+        get { return (Velocity.y * 60 * 60) / 1000f; }
+    }
+
     public  Vector2         enginePosition;
     public  EGear           currentGear = EGear.NEUTRAL;
     public  int[]           gears;
 
-    public  Rigidbody2D[]   wheels;
+    public  Rigidbody2D[]   tyres;
     public  float           turnAngle;
     public  float           breakDrag;
 
@@ -138,9 +147,9 @@ public class Vehicle : MonoBehaviour
 
     void FixedUpdate()
     {
-        foreach(Rigidbody2D wheel in wheels)
+        foreach(Rigidbody2D tyre in tyres)
         {
-            KillOrthogonalVelocity(wheel);
+            KillOrthogonalVelocity(tyre);
         }
     }
 
@@ -159,7 +168,7 @@ public class Vehicle : MonoBehaviour
     {
         float pitch = (Velocity.y / peakVelocity) + 1;
 
-        if(pitch != pitch || pitch > 2 || pitch < 0)
+        if(float.IsNaN(pitch) || pitch > 2 || pitch < 0)
             engineAudio.pitch = 1;
         else
             engineAudio.pitch = pitch;
@@ -178,13 +187,13 @@ public class Vehicle : MonoBehaviour
         currentGear = (EGear)newGear;
     }
 
-    void KillOrthogonalVelocity(Rigidbody2D wheel)
+    void KillOrthogonalVelocity(Rigidbody2D tyre)
     {
-        Vector2 relVel = GetLocalVelocity(wheel);
+        Vector2 relVel = GetLocalVelocity(tyre);
         relVel.y = 0f;
 
-        wheel.AddRelativeForce(-relVel * wheel.mass, ForceMode2D.Impulse);
-        wheel.angularVelocity = 0;
+        tyre.AddRelativeForce(-relVel * tyre.mass, ForceMode2D.Impulse);
+        tyre.angularVelocity = 0;
     }
 
     Vector2 GetLocalVelocity(Rigidbody2D body)

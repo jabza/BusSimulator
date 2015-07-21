@@ -1,25 +1,33 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class BusController : MonoBehaviour 
 {
-    public  Animator            frontDoors;
-    public  AudioClip           doorSFX;
+    public  float       degreesPerRevolution, degreesPerKM;
+    public  Transform   wheelUI;
+    public  Transform   speedUI;
+    public  Button      doorsUI;
+    public  Image       bellUI;
 
-    private Vehicle             vehicle;
-    private AudioSource         audio;
+    public  Sprite      bellDim, bellLit;
+    public  Animator    indicatorLeft, indicatorRight;
 
-    private bool doorsOpen =    false;
+    private Vehicle     vehicle;
+    private Bus         bus;
 
 	void Awake() 
     {
         vehicle = GetComponent<Vehicle>();
-        audio = gameObject.AddComponent<AudioSource>();
+        bus = GetComponent<Bus>();
+
+        doorsUI.onClick.AddListener(() => bus.ToggleDoors());
 	}
 
     void Update()
     {
         UpdateControls();
+        UpdateUI();
     }
 
     void UpdateControls()
@@ -30,38 +38,33 @@ public class BusController : MonoBehaviour
 
         if(Input.GetButtonUp("IndicateLeft"))
         {
-            if(vehicle.Indicator == Vehicle.EIndicator.OFF)
-                vehicle.Indicator = Vehicle.EIndicator.LEFT;
-            else
-                vehicle.Indicator = Vehicle.EIndicator.OFF;
+            vehicle.Indicator = Vehicle.EIndicator.LEFT;
+            indicatorLeft.SetTrigger("Indicate");
+
+            if(indicatorRight.GetCurrentAnimatorStateInfo(0).IsName("Indicating"))
+                indicatorRight.SetTrigger("Indicate");
         }
-        else if (Input.GetButtonUp("IndicateRight"))
+        else if(Input.GetButtonUp("IndicateRight"))
         {
-            if(vehicle.Indicator == Vehicle.EIndicator.OFF)
-                vehicle.Indicator = Vehicle.EIndicator.RIGHT;
-            else
-                vehicle.Indicator = Vehicle.EIndicator.OFF;
+            vehicle.Indicator = Vehicle.EIndicator.RIGHT;
+            indicatorRight.SetTrigger("Indicate");
+
+            if(indicatorLeft.GetCurrentAnimatorStateInfo(0).IsName("Indicating"))
+                indicatorLeft.SetTrigger("Indicate");
         }
 
         if(Input.GetButtonUp("ToggleDoor"))
-            ToggleDoors();
+            bus.ToggleDoors();
     }
 
-    void ToggleDoors()
+    void UpdateUI()
     {
-        if(doorsOpen)
-        {
-            frontDoors.SetTrigger("close");
-            audio.clip = doorSFX;
-            audio.Play();
-        }
-        else
-        {
-            frontDoors.SetTrigger("open");
-            audio.clip = doorSFX;
-            audio.Play();
-        }
+        wheelUI.localRotation = Quaternion.Euler(0, 0, (vehicle.Steering / degreesPerRevolution)*360);
+        speedUI.localRotation = Quaternion.Euler(0, 0, ((-vehicle.Speed * degreesPerKM) + 136));
 
-        doorsOpen = !doorsOpen;
+        if(bus.Bell)
+            bellUI.sprite = bellLit;
+        else
+            bellUI.sprite = bellDim;
     }
 }

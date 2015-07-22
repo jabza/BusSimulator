@@ -58,14 +58,15 @@ public class Vehicle : MonoBehaviour
         set
         {
             if(value == EIndicator.OFF || value == Indicator)
-                miscAudio.Stop();
-            else
-                miscAudio.Play();
-
-            if(value != Indicator)
-                currentIndicator = value;
-            else
+            {
                 currentIndicator = EIndicator.OFF;
+                miscAudio.Stop();
+            }
+            else
+            {
+                currentIndicator = value;
+                miscAudio.Play();
+            }
         }
     }
 

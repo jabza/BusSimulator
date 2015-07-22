@@ -1113,11 +1113,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11442930, guid: a0e48f5ab5005bb468b93f21bccf1ad6, type: 2}
       propertyPath: name
-      value: Beta Street
+      value: Beta
       objectReference: {fileID: 0}
     - target: {fileID: 11400910, guid: a0e48f5ab5005bb468b93f21bccf1ad6, type: 2}
       propertyPath: m_Text
       value: Station Name
+      objectReference: {fileID: 0}
+    - target: {fileID: 6139950, guid: a0e48f5ab5005bb468b93f21bccf1ad6, type: 2}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a0e48f5ab5005bb468b93f21bccf1ad6, type: 2}
@@ -1938,6 +1942,10 @@ Prefab:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1253206218}
+    - target: {fileID: 11442930, guid: a0e48f5ab5005bb468b93f21bccf1ad6, type: 2}
+      propertyPath: name
+      value: Alpha
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a0e48f5ab5005bb468b93f21bccf1ad6, type: 2}
   m_IsPrefabParent: 0

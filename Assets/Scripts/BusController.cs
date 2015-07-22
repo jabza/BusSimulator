@@ -39,18 +39,12 @@ public class BusController : MonoBehaviour
         if(Input.GetButtonUp("IndicateLeft"))
         {
             vehicle.Indicator = Vehicle.EIndicator.LEFT;
-            indicatorLeft.SetTrigger("Indicate");
-
-            if(indicatorRight.GetCurrentAnimatorStateInfo(0).IsName("Indicating"))
-                indicatorRight.SetTrigger("Indicate");
+            UpdateIndicators();
         }
         else if(Input.GetButtonUp("IndicateRight"))
         {
             vehicle.Indicator = Vehicle.EIndicator.RIGHT;
-            indicatorRight.SetTrigger("Indicate");
-
-            if(indicatorLeft.GetCurrentAnimatorStateInfo(0).IsName("Indicating"))
-                indicatorLeft.SetTrigger("Indicate");
+            UpdateIndicators();
         }
 
         if(Input.GetButtonUp("ToggleDoor"))
@@ -66,5 +60,18 @@ public class BusController : MonoBehaviour
             bellUI.sprite = bellLit;
         else
             bellUI.sprite = bellDim;
+    }
+
+    void UpdateIndicators()
+    {
+        if(indicatorLeft.GetCurrentAnimatorStateInfo(0).IsName("Indicating") && (vehicle.Indicator == Vehicle.EIndicator.RIGHT || vehicle.Indicator == Vehicle.EIndicator.OFF))
+            indicatorLeft.SetTrigger("Stop");
+        if(indicatorRight.GetCurrentAnimatorStateInfo(0).IsName("Indicating") && (vehicle.Indicator == Vehicle.EIndicator.LEFT || vehicle.Indicator == Vehicle.EIndicator.OFF))
+            indicatorRight.SetTrigger("Stop");
+ 
+        if(vehicle.Indicator == Vehicle.EIndicator.LEFT)
+            indicatorLeft.SetTrigger("Start");
+        else if(vehicle.Indicator == Vehicle.EIndicator.RIGHT)
+            indicatorRight.SetTrigger("Start");
     }
 }

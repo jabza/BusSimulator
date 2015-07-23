@@ -1,13 +1,29 @@
 ﻿using UnityEngine;
+using System.ComponentModel;
 using System.Collections.Generic;
 
-public class Bus : MonoBehaviour 
+public class Bus : MonoBehaviour, INotifyPropertyChanged
 {
     public  enum                EDoorState { OPEN = 0, SHUT, MOVING }
 
-    public  EDoorState          Doors
-    { 
-        get 
+    public  event               PropertyChangedEventHandler PropertyChanged;
+
+    public  bool                Bell
+    {
+        get { return bell; }
+        private set
+        {
+            if(value != bell)
+            {
+                bell = value;
+                NotifyPropertyChanged("Bell");
+            }
+        }
+    }
+
+    public  EDoorState          Door
+    {
+        get
         {
             AnimatorStateInfo state = frontDoors.GetCurrentAnimatorStateInfo(0);
 
@@ -17,26 +33,17 @@ public class Bus : MonoBehaviour
                 return EDoorState.SHUT;
             else
                 return EDoorState.MOVING;
-        } 
+        }
     }
 
-    public  bool                Bell { get; private set; }
-
     public  Animator            frontDoors;
-    public  AudioClip           bellSFX, doorSFX;
 
     private List<PassengerAI>   queue = new List<PassengerAI>();
     private List<Passenger>     passengers = new List<Passenger>();
 
     private Queue<string>       route = new Queue<string>();
+    private bool                bell = false;
 
-    private AudioSource         audio;
-
-	void Awake() 
-    {
-        audio = gameObject.AddComponent<AudioSource>();
-        audio.clip = bellSFX;
-	}
 
     void Start()
     {
@@ -52,12 +59,8 @@ public class Bus : MonoBehaviour
 
             foreach(Passenger p in passengers)
             {
-                if(p.Destination == route.Peek() && dist <= p.DistanceTillRing && !Bell)
-                {
-                    audio.clip = bellSFX;
-                    audio.Play();
+                if(p.Destination == route.Peek() && dist <= p.DistanceTillRing)
                     Bell = true;
-                }
             }
 
             ProcessQueue();
@@ -101,9 +104,9 @@ public class Bus : MonoBehaviour
     {
         Vector2 target = frontDoors.transform.localPosition;
 
-        if(Doors == EDoorState.SHUT || Doors == EDoorState.MOVING)
+        if(Door == EDoorState.SHUT || Door == EDoorState.MOVING)
             target.x -= 0.5f;
-        else if(Doors == EDoorState.OPEN)
+        else if(Door == EDoorState.OPEN)
             target.x += 0.5f;
 
         foreach(PassengerAI pai in queue)
@@ -125,8 +128,13 @@ public class Bus : MonoBehaviour
 
     public void ToggleDoors()
     {
-        frontDoors.SetTrigger("toggle");
-        audio.clip = doorSFX;
-        audio.Play();
+        frontDoors.SetTrigger("Toggle");
+        NotifyPropertyChanged("Door");
+    }
+
+    void NotifyPropertyChanged(string propName = "")
+    {
+        if(PropertyChanged != null)
+            PropertyChanged(this, new PropertyChangedEventArgs(propName));
     }
 }

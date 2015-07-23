@@ -29,7 +29,7 @@ public class PassengerAI : MonoBehaviour
         }
         else if (State == EState.BOARDING)
         {
-            if(targetBus.GetComponent<Vehicle>().Velocity.y < 0.25)
+            if(targetBus.GetComponent<Vehicle>().Speed < 1)
             {
                 if(Vector2.Distance(transform.position, Target) >= 0.1f)
                     direction = GetDirection(Target);
